@@ -1,0 +1,138 @@
+<div class="person-detail">
+  <div class="detail-header">
+    <psh-button
+      appearance="text"
+      variant="primary"
+      icon="arrow-left"
+      iconPosition="left"
+      (clicked)="handleReturnToList()"
+    >
+      Retour à la liste
+    </psh-button>
+  </div>
+
+  <div class="form-container">
+    <h2>{{ isEdit() ? 'Modifier' : 'Créer' }} la personne</h2>
+    <p class="intro-text">
+      {{ isEdit() ? 'Modifiez' : 'Créez' }} les informations de la personne. Tous les champs marqués d'un astérisque (*) sont obligatoires.
+    </p>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Personal Information -->
+      <div class="form-row">
+        <div class="form-field">
+          <psh-input
+            formControlName="firstName"
+            [required]="true"
+            [error]="getError('firstName')"
+            [success]="isFieldValid('firstName') ? 'Prénom valide' : ''"
+            placeholder="Ex: Jean"
+            [fullWidth]="true"
+            iconStart="user"
+          >
+            <span input-label>Prénom</span>
+            <span input-hint>Votre prénom usuel</span>
+          </psh-input>
+        </div>
+
+        <div class="form-field">
+          <psh-input
+            formControlName="lastName"
+            [required]="true"
+            [error]="getError('lastName')"
+            [success]="isFieldValid('lastName') ? 'Nom valide' : ''"
+            placeholder="Ex: Dupont"
+            [fullWidth]="true"
+            iconStart="user"
+          >
+            <span input-label>Nom</span>
+            <span input-hint>Votre nom de famille</span>
+          </psh-input>
+        </div>
+      </div>
+
+      <!-- Date of Birth -->
+      <div class="form-field">
+        <psh-input
+          formControlName="dateOfBirth"
+          type="date"
+          [required]="true"
+          [error]="getError('dateOfBirth')"
+          [success]="isFieldValid('dateOfBirth') ? 'Date de naissance valide' : ''"
+          [fullWidth]="true"
+          iconStart="calendar"
+        >
+          <span input-label>Date de naissance</span>
+          <span input-hint>Format: JJ/MM/AAAA</span>
+        </psh-input>
+      </div>
+
+      <!-- Birth Location -->
+      <div class="form-row">
+        <div class="form-field">
+          <psh-input
+            formControlName="cityOfBirth"
+            [required]="true"
+            [error]="getError('cityOfBirth')"
+            [success]="isFieldValid('cityOfBirth') ? 'Ville de naissance valide' : ''"
+            placeholder="Ex: Paris"
+            [fullWidth]="true"
+            iconStart="buildings"
+          >
+            <span input-label>Ville de naissance</span>
+            <span input-hint>Ville où vous êtes né(e)</span>
+          </psh-input>
+        </div>
+
+        <div class="form-field">
+          <psh-input
+            formControlName="countryOfBirth"
+            [required]="true"
+            [error]="getError('countryOfBirth')"
+            [success]="isFieldValid('countryOfBirth') ? 'Pays de naissance valide' : ''"
+            placeholder="Ex: France"
+            [fullWidth]="true"
+            iconStart="globe"
+          >
+            <span input-label>Pays de naissance</span>
+            <span input-hint>Pays où vous êtes né(e)</span>
+          </psh-input>
+        </div>
+      </div>
+
+      <!-- Nationality -->
+      <div class="form-field">
+        <psh-input
+          formControlName="nationality"
+          [required]="true"
+          [error]="getError('nationality')"
+          [success]="isFieldValid('nationality') ? 'Nationalité valide' : ''"
+          placeholder="Ex: Française"
+          [fullWidth]="true"
+          iconStart="flag"
+        >
+          <span input-label>Nationalité</span>
+          <span input-hint>Votre nationalité actuelle</span>
+        </psh-input>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <psh-button
+          appearance="text"
+          variant="primary"
+          (clicked)="handleCancel()"
+        >
+          Annuler
+        </psh-button>
+        <psh-button
+          type="submit"
+          variant="primary"
+          [disabled]="!form.valid || isSubmitting"
+          [loading]="isSubmitting"
+        >
+          {{ isSubmitting ? 'Enregistrement...' : (isEdit() ? 'Mettre à jour' : 'Créer') }}
+        </psh-button>
+      </div>
+    </form>
+  </div>
+</div>

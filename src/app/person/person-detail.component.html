@@ -1,0 +1,101 @@
+<div class="person-detail">
+  <div class="detail-header">
+    <psh-button
+      appearance="text"
+      variant="primary"
+      icon="arrow-left"
+      iconPosition="left"
+      (clicked)="handleClose()"
+    >
+      Retour à la liste
+    </psh-button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <psh-spinloader
+        variant="circle"
+        color="primary"
+        size="large"
+      ></psh-spinloader>
+      <p class="loading-text">Chargement des informations...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-container">
+      <p class="error-text">{{ error() }}</p>
+      <psh-button
+        variant="primary"
+        (clicked)="handleClose()"
+      >
+        Retourner à la liste
+      </psh-button>
+    </div>
+  } @else {
+    @if (person(); as p) {
+      <div class="detail-content">
+        <div class="person-header">
+          <psh-avatar
+            [initials]="getInitials(p)"
+            size="xlarge"
+          ></psh-avatar>
+          <div class="person-info">
+            <h2>{{ p.firstName }} {{ p.lastName }}</h2>
+            <psh-tag variant="primary">ID: {{ p.id }}</psh-tag>
+          </div>
+          <psh-button
+            appearance="outline"
+            variant="primary"
+            icon="pencil"
+            iconPosition="left"
+            (clicked)="handleEdit(p.id)"
+          >
+            Modifier
+          </psh-button>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <label>
+              <i class="ph ph-calendar" aria-hidden="true"></i>
+              Date de naissance
+            </label>
+            <span>{{ formatDate(p.dateOfBirth) }}</span>
+          </div>
+          <div class="info-item">
+            <label>
+              <i class="ph ph-buildings" aria-hidden="true"></i>
+              Ville de naissance
+            </label>
+            <span>{{ p.cityOfBirth }}</span>
+          </div>
+          <div class="info-item">
+            <label>
+              <i class="ph ph-globe" aria-hidden="true"></i>
+              Pays de naissance
+            </label>
+            <span>{{ p.countryOfBirth }}</span>
+          </div>
+          <div class="info-item">
+            <label>
+              <i class="ph ph-flag" aria-hidden="true"></i>
+              Nationalité
+            </label>
+            <span>{{ p.nationality }}</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <psh-button
+            appearance="text"
+            variant="danger"
+            icon="trash"
+            iconPosition="left"
+            (clicked)="handleDelete(p.id)"
+          >
+            Supprimer
+          </psh-button>
+        </div>
+      </div>
+    }
+  }
+</div>
