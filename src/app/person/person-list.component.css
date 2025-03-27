@@ -1,0 +1,103 @@
+.person-list {
+  padding: var(--spacing-xl);
+  background: var(--surface-card);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--surface-border);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.list-header h2 {
+  font-size: var(--font-size-2xl);
+  color: var(--text-color);
+  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.list-header h2::before {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 32px;
+  background: var(--primary-color);
+  border-radius: var(--border-radius);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.name-cell {
+  color: var(--primary-color);
+  font-weight: 500;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.name-cell i {
+  font-size: 1.2rem;
+  color: var(--text-color-secondary);
+}
+
+.name-cell:hover {
+  color: var(--primary-color-light);
+}
+
+/* Make entire row clickable */
+:host ::ng-deep tr {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+:host ::ng-deep tr:hover {
+  background-color: var(--surface-hover) !important;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.person-list {
+  animation: slideIn 0.3s ease;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .person-list {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-sm);
+  }
+
+  .list-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

@@ -1,0 +1,13 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@ps/helix/styles/themes/light';
+@import '@ps/helix/styles/themes/dark';
+@import '@ps/helix/styles/utils/animations';
+@import '@ps/helix/styles/utils/spacing';
+@import '@ps/helix/styles/utils/typography';
+@import '@ps/helix/styles/reset';
+
+body{
+    width: 100vw;
+    padding:var(--spacing-md);
+   /*--primary-color : #FF4B33;*/
+}
