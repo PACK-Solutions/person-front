@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { 
+import {
   PshButtonComponent,
   PshAvatarComponent,
   PshTagComponent,
@@ -35,6 +35,11 @@ export class PersonDetailComponent implements OnDestroy {
   protected loading = signal(true);
   protected error = signal<string | null>(null);
 
+  protected avatarSrc = computed(() => {
+    const p = this.person();
+    return p ? this.getAvatarSrc(p.avatar) : '';
+  });
+
   constructor() {
     // Get person ID from route and load data
     const id = this.route.snapshot.params['id'];
@@ -45,10 +50,10 @@ export class PersonDetailComponent implements OnDestroy {
 
   private async loadPerson(id: string | number): Promise<void> {
     if (this.destroyed()) return;
-    
+
     this.loading.set(true);
     this.error.set(null);
-    
+
     try {
       const person = await this.personService.getPerson(id);
       if (!this.destroyed()) {
@@ -63,7 +68,7 @@ export class PersonDetailComponent implements OnDestroy {
           type: 'danger',
           duration: 5000
         });
-        this.router.navigate(['/person']);
+        await this.router.navigate(['/person']);
       }
     } finally {
       if (!this.destroyed()) {
@@ -72,17 +77,13 @@ export class PersonDetailComponent implements OnDestroy {
     }
   }
 
-  protected getInitials(person: Person): string {
-    return `${person.firstName[0]}${person.lastName[0]}`;
-  }
-
   protected formatDate(date: string): string {
     return new Date(date).toLocaleDateString();
   }
 
   protected async handleDelete(id: string | number): Promise<void> {
     if (this.destroyed()) return;
-    
+
     if (confirm('Are you sure you want to delete this person?')) {
       try {
         await this.personService.deletePerson(id);
@@ -92,7 +93,7 @@ export class PersonDetailComponent implements OnDestroy {
             type: 'success',
             duration: 3000
           });
-          this.router.navigate(['/person']);
+          await this.router.navigate(['/person']);
         }
       } catch (error) {
         if (!this.destroyed()) {
@@ -117,6 +118,20 @@ export class PersonDetailComponent implements OnDestroy {
     if (!this.destroyed()) {
       this.router.navigate(['/person']);
     }
+  }
+
+  protected getAvatarSrc(avatar?: string): string {
+    console.log(avatar);
+
+    if (!avatar) return '';
+
+    // Check if the avatar already has a data URL prefix
+    if (avatar.startsWith('data:')) {
+      return avatar;
+    }
+
+    // Add the base64 PNG prefix
+    return `data:image/png;base64,${avatar}`;
   }
 
   ngOnDestroy(): void {

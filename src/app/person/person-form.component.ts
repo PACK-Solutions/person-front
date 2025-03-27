@@ -2,7 +2,7 @@ import { Component, computed, inject, input, signal, ChangeDetectionStrategy, On
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PshInputComponent, PshButtonComponent } from '@ps/helix';
+import { PshInputComponent, PshButtonComponent, PshSpinLoaderComponent } from '@ps/helix';
 import { ToastService } from '@ps/helix';
 import { PersonService } from './person.service';
 import { Person } from './person.types';
@@ -15,7 +15,8 @@ import { format, parse } from 'date-fns';
     CommonModule,
     ReactiveFormsModule,
     PshInputComponent,
-    PshButtonComponent
+    PshButtonComponent,
+    PshSpinLoaderComponent
   ],
   templateUrl: './person-form.component.html',
   styleUrls: ['./person-form.component.css'],
@@ -31,7 +32,7 @@ export class PersonFormComponent implements OnInit, OnDestroy {
 
   // State
   protected form!: FormGroup;
-  protected isSubmitting = false;
+  protected isSubmitting = signal(false);
   protected loading = signal(false);
   protected error = signal<string | null>(null);
   private personData = signal<Person | null>(null);
@@ -86,12 +87,12 @@ export class PersonFormComponent implements OnInit, OnDestroy {
   private initForm(): void {
     this.form = this.fb.group({
       firstName: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.minLength(2),
         Validators.pattern(this.NAME_REGEX)
       ]],
       lastName: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.minLength(2),
         Validators.pattern(this.NAME_REGEX)
       ]],
@@ -135,11 +136,11 @@ export class PersonFormComponent implements OnInit, OnDestroy {
 
     const date = parse(control.value, 'yyyy-MM-dd', new Date());
     const today = new Date();
-    
+
     if (isNaN(date.getTime())) {
       return { invalidDate: true };
     }
-    
+
     if (date > today) {
       return { futureDate: true };
     }
@@ -160,7 +161,7 @@ export class PersonFormComponent implements OnInit, OnDestroy {
     }
 
     const fieldName = field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1');
-    
+
     if (control.errors['required']) {
       return `${fieldName} est requis`;
     }
@@ -188,15 +189,15 @@ export class PersonFormComponent implements OnInit, OnDestroy {
   }
 
   protected async onSubmit(): Promise<void> {
-    if (this.form.valid && !this.isSubmitting && !this.destroyed()) {
-      this.isSubmitting = true;
+    if (this.form.valid && !this.isSubmitting() && !this.destroyed()) {
+      this.isSubmitting.set(true);
 
       try {
         const formData = {
           ...this.form.value,
           dateOfBirth: format(new Date(this.form.value.dateOfBirth), 'yyyy-MM-dd')
         };
-        
+
         const currentPerson = this.personData();
 
         if (currentPerson && !this.destroyed()) {
@@ -213,12 +214,12 @@ export class PersonFormComponent implements OnInit, OnDestroy {
               duration: 3000
             });
 
-            this.router.navigate(['/person', updatedPerson.id]);
+            await this.router.navigate(['/person', updatedPerson.id]);
           }
         } else if (!this.destroyed()) {
           // Create new person
           const newPerson = await this.personService.createPerson(formData);
-          
+
           if (!this.destroyed()) {
             this.toastService.show({
               message: 'Personne créée avec succès !',
@@ -226,13 +227,13 @@ export class PersonFormComponent implements OnInit, OnDestroy {
               duration: 3000
             });
 
-            this.router.navigate(['/person', newPerson.id]);
+            await this.router.navigate(['/person', newPerson.id]);
           }
         }
       } catch (error) {
         if (!this.destroyed()) {
           console.error('Form submission error:', error);
-          
+
           this.toastService.show({
             message: 'Une erreur est survenue. Veuillez réessayer.',
             type: 'danger',
@@ -241,7 +242,7 @@ export class PersonFormComponent implements OnInit, OnDestroy {
         }
       } finally {
         if (!this.destroyed()) {
-          this.isSubmitting = false;
+          this.isSubmitting.set(false);
         }
       }
     } else {
@@ -255,7 +256,7 @@ export class PersonFormComponent implements OnInit, OnDestroy {
 
   protected handleCancel(): void {
     if (this.destroyed()) return;
-    
+
     const currentPerson = this.personData();
     if (currentPerson) {
       this.router.navigate(['/person', currentPerson.id]);

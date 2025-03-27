@@ -1,7 +1,7 @@
 <div class="person-list">
   <div class="list-header">
     <h2>Liste des personnes</h2>
-    <psh-button 
+    <psh-button
       variant="primary"
       icon="plus"
       iconPosition="left"
@@ -11,50 +11,61 @@
     </psh-button>
   </div>
 
-  <psh-table
-    [columns]="columns"
-    [data]="personService.people()"
-    [globalSearch]="true"
-    [hoverable]="true"
-    globalSearchPlaceholder="Rechercher une personne..."
-    size="medium"
-    (rowClick)="handleRowClick($event)"
-  >
-    <!-- Name template -->
-    <ng-template #nameTemplate let-row>
-      <div class="name-cell">
-        <i class="ph ph-user" aria-hidden="true"></i>
-        {{ row.firstName }} {{ row.lastName }}
-      </div>
-    </ng-template>
+  @if (personService.loadingPeople()) {
+    <div class="loading-container">
+      <psh-spinloader
+        variant="circle"
+        color="primary"
+        size="large"
+      ></psh-spinloader>
+      <p class="loading-text">Chargement de la liste des personnes...</p>
+    </div>
+  } @else {
+    <psh-table
+      [columns]="columns"
+      [data]="personService.people()"
+      [globalSearch]="true"
+      [hoverable]="true"
+      globalSearchPlaceholder="Rechercher une personne..."
+      size="medium"
+      (rowClick)="handleRowClick($event)"
+    >
+      <!-- Name template -->
+      <ng-template #nameTemplate let-row>
+        <div class="name-cell">
+          <i class="ph ph-user" aria-hidden="true"></i>
+          {{ row.firstName }} {{ row.lastName }}
+        </div>
+      </ng-template>
 
-    <!-- Date template -->
-    <ng-template #dateTemplate let-row>
-      {{ formatDate(row.dateOfBirth) }}
-    </ng-template>
+      <!-- Date template -->
+      <ng-template #dateTemplate let-row>
+        {{ formatDate(row.dateOfBirth) }}
+      </ng-template>
 
-    <!-- Actions template -->
-    <ng-template #actionsTemplate let-row>
-      <div class="actions">
-        <psh-button
-          appearance="text"
-          variant="primary"
-          icon="eye"
-          iconPosition="left"
-          (clicked)="handleView(row.id, $event)"
-        >
-          Voir
-        </psh-button>
-        <psh-button
-          appearance="text"
-          variant="primary"
-          icon="pencil"
-          iconPosition="left"
-          (clicked)="handleEdit(row.id, $event)"
-        >
-          Modifier
-        </psh-button>
-      </div>
-    </ng-template>
-  </psh-table>
+      <!-- Actions template -->
+      <ng-template #actionsTemplate let-row>
+        <div class="actions">
+          <psh-button
+            appearance="text"
+            variant="primary"
+            icon="eye"
+            iconPosition="left"
+            (clicked)="handleView(row.id, $event)"
+          >
+            Voir
+          </psh-button>
+          <psh-button
+            appearance="text"
+            variant="primary"
+            icon="pencil"
+            iconPosition="left"
+            (clicked)="handleEdit(row.id, $event)"
+          >
+            Modifier
+          </psh-button>
+        </div>
+      </ng-template>
+    </psh-table>
+  }
 </div>

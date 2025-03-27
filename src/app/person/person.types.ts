@@ -16,4 +16,6 @@ export interface Person {
   countryOfBirth: string;
   /** Nationality */
   nationality: string;
+  /** Avatar URL */
+  avatar?: string;
 }

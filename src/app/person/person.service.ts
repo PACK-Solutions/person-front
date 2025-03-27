@@ -1,87 +1,123 @@
-import { Injectable, signal } from '@angular/core';
-import { Person } from './person.types';
+import {Injectable, signal} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {firstValueFrom} from 'rxjs';
+import {Person} from './person.types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PersonService {
-  // Mock data with more realistic information
-  private mockPeople: Person[] = [
-    {
-      id: '1',
-      firstName: 'John',
-      lastName: 'Doe',
-      dateOfBirth: '1990-01-01',
-      cityOfBirth: 'New York',
-      countryOfBirth: 'USA',
-      nationality: 'American'
-    },
-    {
-      id: '2',
-      firstName: 'Jane',
-      lastName: 'Smith',
-      dateOfBirth: '1985-05-15',
-      cityOfBirth: 'London',
-      countryOfBirth: 'UK',
-      nationality: 'British'
-    }
-  ];
+  private apiUrl = '/api/persons';
 
   // State
-  private peopleSignal = signal<Person[]>(this.mockPeople);
+  private peopleSignal = signal<Person[]>([]);
   people = this.peopleSignal.asReadonly();
 
-  async getPerson(id: string | number): Promise<Person> {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const person = this.mockPeople.find(p => p.id === id.toString());
-    if (!person) {
-      throw new Error('Person not found');
+  // Loading states
+  private loadingPeopleSignal = signal<boolean>(false);
+  loadingPeople = this.loadingPeopleSignal.asReadonly();
+
+  private loadingPersonSignal = signal<boolean>(false);
+  loadingPerson = this.loadingPersonSignal.asReadonly();
+
+  private savingPersonSignal = signal<boolean>(false);
+  savingPerson = this.savingPersonSignal.asReadonly();
+
+  private deletingPersonSignal = signal<boolean>(false);
+  deletingPerson = this.deletingPersonSignal.asReadonly();
+
+  constructor(private http: HttpClient) {
+    // Load initial data
+    this.loadPeople();
+  }
+
+  private async loadPeople(): Promise<void> {
+    this.loadingPeopleSignal.set(true);
+
+    try {
+      const people = await firstValueFrom(this.http.get<Person[]>(this.apiUrl));
+      this.peopleSignal.set(people);
+    } catch (error) {
+      console.error('Error loading people:', error);
+      // Initialize with empty array if API call fails
+      this.peopleSignal.set([]);
+    } finally {
+      this.loadingPeopleSignal.set(false);
     }
-    return person;
+  }
+
+  async getPerson(id: string | number): Promise<Person> {
+    this.loadingPersonSignal.set(true);
+
+    try {
+      return await firstValueFrom(this.http.get<Person>(`${this.apiUrl}/${id}`));
+    } catch (error) {
+      console.error(`Error getting person with id ${id}:`, error);
+      throw new Error('Person not found');
+    } finally {
+      this.loadingPersonSignal.set(false);
+    }
   }
 
   async createPerson(data: Omit<Person, 'id'>): Promise<Person> {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    this.savingPersonSignal.set(true);
 
-    const newPerson: Person = {
-      ...data,
-      id: Math.random().toString(36).substring(7)
-    };
-
-    this.mockPeople.push(newPerson);
-    this.peopleSignal.set([...this.mockPeople]);
-
-    return newPerson;
+    try {
+      const newPerson = await firstValueFrom(this.http.post<Person>(this.apiUrl, data));
+      // Update the local state
+      const currentPeople = this.peopleSignal();
+      this.peopleSignal.set([...currentPeople, newPerson]);
+      return newPerson;
+    } catch (error) {
+      console.error('Error creating person:', error);
+      throw new Error('Failed to create person');
+    } finally {
+      this.savingPersonSignal.set(false);
+    }
   }
 
   async updatePerson(person: Person): Promise<Person> {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    this.savingPersonSignal.set(true);
 
-    const index = this.mockPeople.findIndex(p => p.id === person.id);
-    if (index === -1) {
-      throw new Error('Person not found');
+    try {
+      const updatedPerson = await firstValueFrom(
+        this.http.put<Person>(`${this.apiUrl}/${person.id}`, person)
+      );
+
+      // Update the local state
+      const currentPeople = this.peopleSignal();
+      const index = currentPeople.findIndex(p => p.id === person.id);
+
+      if (index !== -1) {
+        const updatedPeople = [...currentPeople];
+        updatedPeople[index] = updatedPerson;
+        this.peopleSignal.set(updatedPeople);
+      }
+
+      return updatedPerson;
+    } catch (error) {
+      console.error(`Error updating person with id ${person.id}:`, error);
+      throw new Error('Failed to update person');
+    } finally {
+      this.savingPersonSignal.set(false);
     }
-
-    this.mockPeople[index] = person;
-    this.peopleSignal.set([...this.mockPeople]);
-
-    return person;
   }
 
   async deletePerson(id: string | number): Promise<void> {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    this.deletingPersonSignal.set(true);
 
-    const index = this.mockPeople.findIndex(p => p.id === id.toString());
-    if (index === -1) {
-      throw new Error('Person not found');
+    try {
+      await firstValueFrom(this.http.delete<void>(`${this.apiUrl}/${id}`));
+
+      // Update the local state
+      const currentPeople = this.peopleSignal();
+      const filteredPeople = currentPeople.filter(p => p.id !== id.toString());
+      this.peopleSignal.set(filteredPeople);
+    } catch (error) {
+      console.error(`Error deleting person with id ${id}:`, error);
+      throw new Error('Failed to delete person');
+    } finally {
+      this.deletingPersonSignal.set(false);
     }
-
-    this.mockPeople.splice(index, 1);
-    this.peopleSignal.set([...this.mockPeople]);
   }
 }

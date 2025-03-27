@@ -1,7 +1,7 @@
 import { Component, ViewChild, TemplateRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { PshTableComponent, PshButtonComponent } from '@ps/helix';
+import { PshTableComponent, PshButtonComponent, PshSpinLoaderComponent } from '@ps/helix';
 import { TableColumn, TableRowClickEvent } from '@ps/helix';
 import { PersonService } from './person.service';
 
@@ -11,7 +11,8 @@ import { PersonService } from './person.service';
   imports: [
     CommonModule,
     PshTableComponent,
-    PshButtonComponent
+    PshButtonComponent,
+    PshSpinLoaderComponent
   ],
   templateUrl: './person-list.component.html',
   styleUrls: ['./person-list.component.css']
@@ -25,27 +26,27 @@ export class PersonListComponent {
 
   // Initialize columns without templates first
   protected columns: TableColumn[] = [
-    { 
-      key: 'id', 
-      label: 'ID', 
+    {
+      key: 'id',
+      label: 'ID',
       width: '10%',
-      sortable: true 
+      sortable: true
     },
-    { 
-      key: 'firstName', 
-      label: 'Prénom', 
+    {
+      key: 'firstName',
+      label: 'Prénom',
       width: '25%',
       sortable: true
     },
-    { 
-      key: 'lastName', 
-      label: 'Nom', 
+    {
+      key: 'lastName',
+      label: 'Nom',
       width: '25%',
       sortable: true
     },
-    { 
-      key: 'dateOfBirth', 
-      label: 'Date de naissance', 
+    {
+      key: 'dateOfBirth',
+      label: 'Date de naissance',
       width: '40%',
       sortable: true,
       sortFn: (a, b) => {
