@@ -31,7 +31,7 @@ export class PersonService {
     this.loadPeople();
   }
 
-  private async loadPeople(): Promise<void> {
+  async loadPeople(): Promise<void> {
     this.loadingPeopleSignal.set(true);
 
     try {

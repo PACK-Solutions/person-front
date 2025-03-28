@@ -88,6 +88,9 @@ export class PersonDetailComponent implements OnDestroy {
       try {
         await this.personService.deletePerson(id);
         if (!this.destroyed()) {
+          // Reload the people list to ensure it's up-to-date
+          await this.personService.loadPeople();
+
           this.toastService.show({
             message: 'Person deleted successfully',
             type: 'success',
