@@ -17,14 +17,6 @@ export class PersonService {
   private loadingPeopleSignal = signal<boolean>(false);
   loadingPeople = this.loadingPeopleSignal.asReadonly();
 
-  private loadingPersonSignal = signal<boolean>(false);
-  loadingPerson = this.loadingPersonSignal.asReadonly();
-
-  private savingPersonSignal = signal<boolean>(false);
-  savingPerson = this.savingPersonSignal.asReadonly();
-
-  private deletingPersonSignal = signal<boolean>(false);
-  deletingPerson = this.deletingPersonSignal.asReadonly();
 
   constructor(private http: HttpClient) {
     // Load initial data
@@ -47,21 +39,15 @@ export class PersonService {
   }
 
   async getPerson(id: string | number): Promise<Person> {
-    this.loadingPersonSignal.set(true);
-
     try {
       return await firstValueFrom(this.http.get<Person>(`${this.apiUrl}/${id}`));
     } catch (error) {
       console.error(`Error getting person with id ${id}:`, error);
       throw new Error('Person not found');
-    } finally {
-      this.loadingPersonSignal.set(false);
     }
   }
 
   async createPerson(data: Omit<Person, 'id'>): Promise<Person> {
-    this.savingPersonSignal.set(true);
-
     try {
       const newPerson = await firstValueFrom(this.http.post<Person>(this.apiUrl, data));
       // Update the local state
@@ -71,14 +57,10 @@ export class PersonService {
     } catch (error) {
       console.error('Error creating person:', error);
       throw new Error('Failed to create person');
-    } finally {
-      this.savingPersonSignal.set(false);
     }
   }
 
   async updatePerson(person: Person): Promise<Person> {
-    this.savingPersonSignal.set(true);
-
     try {
       const updatedPerson = await firstValueFrom(
         this.http.put<Person>(`${this.apiUrl}/${person.id}`, person)
@@ -98,14 +80,10 @@ export class PersonService {
     } catch (error) {
       console.error(`Error updating person with id ${person.id}:`, error);
       throw new Error('Failed to update person');
-    } finally {
-      this.savingPersonSignal.set(false);
     }
   }
 
   async deletePerson(id: string | number): Promise<void> {
-    this.deletingPersonSignal.set(true);
-
     try {
       await firstValueFrom(this.http.delete<void>(`${this.apiUrl}/${id}`));
 
@@ -116,8 +94,6 @@ export class PersonService {
     } catch (error) {
       console.error(`Error deleting person with id ${id}:`, error);
       throw new Error('Failed to delete person');
-    } finally {
-      this.deletingPersonSignal.set(false);
     }
   }
 }

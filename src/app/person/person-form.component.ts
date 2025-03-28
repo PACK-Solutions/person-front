@@ -2,7 +2,7 @@ import { Component, computed, inject, input, signal, ChangeDetectionStrategy, On
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PshInputComponent, PshButtonComponent, PshSpinLoaderComponent } from '@ps/helix';
+import { PshInputComponent, PshButtonComponent } from '@ps/helix';
 import { ToastService } from '@ps/helix';
 import { PersonService } from './person.service';
 import { Person } from './person.types';
@@ -15,8 +15,7 @@ import { format, parse } from 'date-fns';
     CommonModule,
     ReactiveFormsModule,
     PshInputComponent,
-    PshButtonComponent,
-    PshSpinLoaderComponent
+    PshButtonComponent
   ],
   templateUrl: './person-form.component.html',
   styleUrls: ['./person-form.component.css'],

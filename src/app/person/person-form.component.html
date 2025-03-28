@@ -11,26 +11,6 @@
     </psh-button>
   </div>
 
-  @if (loading()) {
-    <div class="loading-container">
-      <psh-spinloader
-        variant="circle"
-        color="primary"
-        size="large"
-      ></psh-spinloader>
-      <p class="loading-text">Chargement des informations...</p>
-    </div>
-  } @else if (error()) {
-    <div class="error-container">
-      <p class="error-text">{{ error() }}</p>
-      <psh-button
-        variant="primary"
-        (clicked)="handleReturnToList()"
-      >
-        Retourner à la liste
-      </psh-button>
-    </div>
-  } @else {
     <div class="form-container">
       <h2>{{ isEdit() ? 'Modifier' : 'Créer' }} la personne</h2>
       <p class="intro-text">
@@ -155,5 +135,4 @@
         </div>
       </form>
     </div>
-  }
 </div>
