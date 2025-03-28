@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { 
   PshButtonComponent,
-  PshAvatarComponent,
   PshTagComponent,
   PshSpinLoaderComponent,
   ToastService
@@ -17,7 +16,6 @@ import { Person } from './person.types';
   imports: [
     CommonModule,
     PshButtonComponent,
-    PshAvatarComponent,
     PshTagComponent,
     PshSpinLoaderComponent
   ],

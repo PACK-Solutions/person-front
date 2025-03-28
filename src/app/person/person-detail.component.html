@@ -34,10 +34,9 @@
     @if (person(); as p) {
       <div class="detail-content">
         <div class="person-header">
-          <psh-avatar
-            [initials]="getInitials(p)"
-            size="xlarge"
-          ></psh-avatar>
+          <!--
+          Insérer avatar ici
+          -->
           <div class="person-info">
             <h2>{{ p.firstName }} {{ p.lastName }}</h2>
             <psh-tag variant="primary">ID: {{ p.id }}</psh-tag>
