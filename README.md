@@ -2,7 +2,7 @@
 
 A modern Angular application for managing person records with a clean, responsive interface.
 
-![Person Front Screenshot](https://via.placeholder.com/800x400?text=Person+Front+Screenshot)
+![Person Front Screenshot](screenshot.png)
 
 ## Overview
 
@@ -105,6 +105,20 @@ ng generate --help
 - [Angular Documentation](https://angular.dev)
 - [Angular CLI Documentation](https://angular.dev/tools/cli)
 - [Helix Design System](https://example.com/helix) (if publicly available)
+
+## Exercise
+
+- Add the avatar component in the detail person component: [PS Helix Avatar](http://prd-git01.packsolutions.local/development/ps-helix/-/blob/main/src/lib/components/avatar/avatar.md?ref_type=heads)
+- Modify the `person.service.ts` to interact with the person-api
+- Bind the avatar to the api avatar base 64 image (tip: suffix the base 64 with: `data:image/png;base64,`)
+- Setup [Playwright](https://playwright.dev) for end-to-end testing
+  1. Install [playwright-ng-schematics](https://github.com/playwright-community/playwright-ng-schematics): `ng add playwright-ng-schematics`
+  2. Write your first e2e test
+  3. Install Playwright Vscode plugin [Playwright Vscode plugin](https://playwright.dev/docs/getting-started-vscode)
+  4. Run the tests
+     `ng e2e --ui`
+     or
+     `npm run e2e -- --ui`
 
 ## Contributors
 
