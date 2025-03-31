@@ -47,22 +47,35 @@ Each person record contains the following information:
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/PACK-Solutions/person-front.git
    cd person-front
    ```
 
-2. Install dependencies:
+2. Clone ps-helix and build it:
+
    ```bash
+   git clone http://prd-git01.packsolutions.local/development/ps-helix
+   npm run build
+   cd dist/ps-helix
+   npm pack
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install ../ps-helix/dist/ps-helix/ps-helix-1.0.0.tgz
    npm install
    ```
 
-3. Start the development server:
+4. Start the development server:
+
    ```bash
-   npm start
+   npm run start
    ```
 
-4. Open your browser and navigate to `http://localhost:4200`
+5. Open your browser and navigate to `http://localhost:4200`
 
 ## Building for Production
 
@@ -84,7 +97,7 @@ npm test
 
 ## Development
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 19.
 
 ### Code Scaffolding
 
