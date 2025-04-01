@@ -21,6 +21,7 @@
         <div class="form-row">
           <div class="form-field">
             <psh-input
+              label="Prénom"
               formControlName="firstName"
               [required]="true"
               [error]="getError('firstName')"
@@ -29,13 +30,13 @@
               [fullWidth]="true"
               iconStart="user"
             >
-              <span input-label>Prénom</span>
               <span input-hint>Votre prénom usuel</span>
             </psh-input>
           </div>
 
           <div class="form-field">
             <psh-input
+              label="Nom de famille"
               formControlName="lastName"
               [required]="true"
               [error]="getError('lastName')"
@@ -44,7 +45,6 @@
               [fullWidth]="true"
               iconStart="user"
             >
-              <span input-label>Nom</span>
               <span input-hint>Votre nom de famille</span>
             </psh-input>
           </div>
@@ -53,6 +53,7 @@
         <!-- Date of Birth -->
         <div class="form-field">
           <psh-input
+            label="Date de naissance"
             formControlName="dateOfBirth"
             type="date"
             [required]="true"
@@ -61,7 +62,6 @@
             [fullWidth]="true"
             iconStart="calendar"
           >
-            <span input-label>Date de naissance</span>
             <span input-hint>Format: JJ/MM/AAAA</span>
           </psh-input>
         </div>
@@ -70,6 +70,7 @@
         <div class="form-row">
           <div class="form-field">
             <psh-input
+              label="Ville de naissance"
               formControlName="cityOfBirth"
               [required]="true"
               [error]="getError('cityOfBirth')"
@@ -78,7 +79,6 @@
               [fullWidth]="true"
               iconStart="buildings"
             >
-              <span input-label>Ville de naissance</span>
               <span input-hint>Ville où vous êtes né(e)</span>
             </psh-input>
           </div>
@@ -102,6 +102,7 @@
         <!-- Nationality -->
         <div class="form-field">
           <psh-input
+            label="Nationalité"
             formControlName="nationality"
             [required]="true"
             [error]="getError('nationality')"
