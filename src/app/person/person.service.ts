@@ -2,6 +2,7 @@ import {Injectable, signal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
 import {Person} from './person.types';
+import {isHttpError} from '../shared/error-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +57,12 @@ export class PersonService {
       return newPerson;
     } catch (error) {
       console.error('Error creating person:', error);
-      throw new Error('Failed to create person');
+      // Preserve the original error status for conflict errors
+      if (isHttpError(error, 409)) {
+        throw error; // Rethrow the original error with status
+      } else {
+        throw new Error('Failed to create person');
+      }
     }
   }
 

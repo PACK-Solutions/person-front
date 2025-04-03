@@ -7,6 +7,7 @@ import { ToastService } from '@ps/helix';
 import { PersonService } from './person.service';
 import { Person } from './person.types';
 import { format, parse } from 'date-fns';
+import { isHttpError } from '../shared/error-utils';
 
 @Component({
   selector: 'ds-person-form',
@@ -233,11 +234,20 @@ export class PersonFormComponent implements OnInit, OnDestroy {
         if (!this.destroyed()) {
           console.error('Form submission error:', error);
 
-          this.toastService.show({
-            message: 'Une erreur est survenue. Veuillez réessayer.',
-            type: 'danger',
-            duration: 5000
-          });
+          // Check if it's a 409 Conflict error (person already exists)
+          if (isHttpError(error, 409)) {
+            this.toastService.show({
+              message: 'Une personne avec ce nom et prénom existe déjà.',
+              type: 'warning',
+              duration: 5000
+            });
+          } else {
+            this.toastService.show({
+              message: 'Une erreur est survenue. Veuillez réessayer.',
+              type: 'danger',
+              duration: 5000
+            });
+          }
         }
       } finally {
         if (!this.destroyed()) {
