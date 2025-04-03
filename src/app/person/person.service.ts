@@ -1,6 +1,6 @@
 import {Injectable, signal} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {firstValueFrom} from 'rxjs';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {catchError, finalize, firstValueFrom, Observable, of, tap, throwError} from 'rxjs';
 import {Person} from './person.types';
 import {isHttpError} from '../shared/error-utils';
 
@@ -24,82 +24,95 @@ export class PersonService {
     this.loadPeople();
   }
 
-  async loadPeople(): Promise<void> {
+  /**
+   * Handle HTTP errors
+   * @param error - The HTTP error response
+   * @param operation - The operation that failed
+   * @returns An observable with a user-facing error message
+   */
+  private handleError(error: HttpErrorResponse, operation: string) {
+    console.error(`${operation} failed:`, error);
+
+    // Preserve the original error status for specific status codes
+    if (isHttpError(error, 409)) {
+      return throwError(() => error);
+    }
+
+    // Return a custom error message
+    return throwError(() => new Error(`Failed to ${operation.toLowerCase()}`));
+  }
+
+  loadPeople(): void {
     this.loadingPeopleSignal.set(true);
 
-    try {
-      const people = await firstValueFrom(this.http.get<Person[]>(this.apiUrl));
-      this.peopleSignal.set(people);
-    } catch (error) {
-      console.error('Error loading people:', error);
-      // Initialize with empty array if API call fails
-      this.peopleSignal.set([]);
-    } finally {
-      this.loadingPeopleSignal.set(false);
-    }
+    this.http.get<Person[]>(this.apiUrl)
+      .pipe(
+        tap(people => this.peopleSignal.set(people)),
+        catchError(error => {
+          // Initialize with empty array if API call fails
+          this.peopleSignal.set([]);
+          return this.handleError(error, 'Load people');
+        }),
+        finalize(() => this.loadingPeopleSignal.set(false))
+      )
+      .subscribe();
   }
 
-  async getPerson(id: string | number): Promise<Person> {
-    try {
-      return await firstValueFrom(this.http.get<Person>(`${this.apiUrl}/${id}`));
-    } catch (error) {
-      console.error(`Error getting person with id ${id}:`, error);
-      throw new Error('Person not found');
-    }
+  getPerson(id: string | number): Promise<Person> {
+    return firstValueFrom(
+      this.http.get<Person>(`${this.apiUrl}/${id}`)
+        .pipe(
+          catchError(error => this.handleError(error, `Get person with id ${id}`))
+        )
+    );
   }
 
-  async createPerson(data: Omit<Person, 'id'>): Promise<Person> {
-    try {
-      const newPerson = await firstValueFrom(this.http.post<Person>(this.apiUrl, data));
-      // Update the local state
-      const currentPeople = this.peopleSignal();
-      this.peopleSignal.set([...currentPeople, newPerson]);
-      return newPerson;
-    } catch (error) {
-      console.error('Error creating person:', error);
-      // Preserve the original error status for conflict errors
-      if (isHttpError(error, 409)) {
-        throw error; // Rethrow the original error with status
-      } else {
-        throw new Error('Failed to create person');
-      }
-    }
+  createPerson(data: Omit<Person, 'id'>): Promise<Person> {
+    return firstValueFrom(
+      this.http.post<Person>(this.apiUrl, data)
+        .pipe(
+          tap(newPerson => {
+            // Update the local state
+            const currentPeople = this.peopleSignal();
+            this.peopleSignal.set([...currentPeople, newPerson]);
+          }),
+          catchError(error => this.handleError(error, 'Create person'))
+        )
+    );
   }
 
-  async updatePerson(person: Person): Promise<Person> {
-    try {
-      const updatedPerson = await firstValueFrom(
-        this.http.put<Person>(`${this.apiUrl}/${person.id}`, person)
-      );
+  updatePerson(person: Person): Promise<Person> {
+    return firstValueFrom(
+      this.http.put<Person>(`${this.apiUrl}/${person.id}`, person)
+        .pipe(
+          tap(updatedPerson => {
+            // Update the local state
+            const currentPeople = this.peopleSignal();
+            const index = currentPeople.findIndex(p => p.id === person.id);
 
-      // Update the local state
-      const currentPeople = this.peopleSignal();
-      const index = currentPeople.findIndex(p => p.id === person.id);
-
-      if (index !== -1) {
-        const updatedPeople = [...currentPeople];
-        updatedPeople[index] = updatedPerson;
-        this.peopleSignal.set(updatedPeople);
-      }
-
-      return updatedPerson;
-    } catch (error) {
-      console.error(`Error updating person with id ${person.id}:`, error);
-      throw new Error('Failed to update person');
-    }
+            if (index !== -1) {
+              const updatedPeople = [...currentPeople];
+              updatedPeople[index] = updatedPerson;
+              this.peopleSignal.set(updatedPeople);
+            }
+          }),
+          catchError(error => this.handleError(error, `Update person with id ${person.id}`))
+        )
+    );
   }
 
-  async deletePerson(id: string | number): Promise<void> {
-    try {
-      await firstValueFrom(this.http.delete<void>(`${this.apiUrl}/${id}`));
-
-      // Update the local state
-      const currentPeople = this.peopleSignal();
-      const filteredPeople = currentPeople.filter(p => p.id !== id.toString());
-      this.peopleSignal.set(filteredPeople);
-    } catch (error) {
-      console.error(`Error deleting person with id ${id}:`, error);
-      throw new Error('Failed to delete person');
-    }
+  deletePerson(id: string | number): Promise<void> {
+    return firstValueFrom(
+      this.http.delete<void>(`${this.apiUrl}/${id}`)
+        .pipe(
+          tap(() => {
+            // Update the local state
+            const currentPeople = this.peopleSignal();
+            const filteredPeople = currentPeople.filter(p => p.id !== id.toString());
+            this.peopleSignal.set(filteredPeople);
+          }),
+          catchError(error => this.handleError(error, `Delete person with id ${id}`))
+        )
+    );
   }
 }
