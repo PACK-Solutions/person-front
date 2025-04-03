@@ -80,14 +80,4 @@ export class PersonListComponent {
   protected handleRowClick(event: TableRowClickEvent): void {
     this.handleView(event.id);
   }
-
-  ngAfterViewInit() {
-    // Update only the template properties after view init
-    this.columns = this.columns.map(column => {
-      if (column.key === 'dateOfBirth') {
-        return { ...column, template: this.dateTemplate };
-      }
-      return column;
-    });
-  }
 }
